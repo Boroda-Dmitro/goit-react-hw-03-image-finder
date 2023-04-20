@@ -48,11 +48,11 @@ export class App extends Component {
   onLoadMoreClick = () => {
     this.setState(prevState => ({
       page: prevState.page + 1,
-    }));
-    const { search, page } = this.state;
-    console.log(page);
-    this.getImages(search, page);
-
+    }), () => {
+      const { search, page } = this.state;
+      console.log(page);
+      this.getImages(search, page);
+    });
   };
 
   render() {
