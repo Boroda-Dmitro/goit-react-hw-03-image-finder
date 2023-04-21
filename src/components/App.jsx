@@ -5,6 +5,7 @@ import { ImageGallery } from './ImageGallery/ImageGallery';
 import { Button } from './Button/Button';
 import { Loader } from './Loader/Loader';
 import { ToastContainer, toast } from 'react-toastify';
+import { Modal } from './Modal/Modal';
 import 'react-toastify/dist/ReactToastify.css';
 import css from './App.module.css';
 
@@ -14,55 +15,87 @@ export class App extends Component {
     images: [],
     page: 1,
     isLoading: false,
-    hasMoreImages: false,
+    total: 0,
+    error: null,
+    showModal: false,
+    imageInfo: { modalImage: '', tags: '' },
   };
+
+  componentDidUpdate(_, prevState) {
+    const { search, page } = this.state;
+    if (search !== prevState.search || prevState.page !== page) {
+      this.getImages(search, page);
+    }
+  }
 
   onSubmit = searchImages => {
     this.setState({ search: searchImages, page: 1, images: [] });
-    this.getImages(searchImages);
   };
 
   getImages = async (search, page) => {
     this.setState({ isLoading: true });
     try {
       const { Arr, total } = await fetchImages(search, page);
-      if (Arr.length > 0) {
-        this.setState(prevState => ({
-          images: [...prevState.images, ...Arr],
-          hasMoreImages: total > prevState.images.length + Arr.length,
-        }));
-      } else {
-        this.setState({ hasMoreImages: false });
+      if (Arr.length === 0) {
         return toast.error(`No images on search ${search}`);
       }
+
+      this.setState(prevState => ({
+        images: [...prevState.images, ...Arr],
+        total,
+      }));
     } catch (error) {
-      console.log(error);
+      this.setState({ error });
     } finally {
       this.setState({ isLoading: false });
     }
   };
 
   onLoadMoreClick = () => {
-    if (!this.state.hasMoreImages) return;
-    this.setState(
-      prevState => ({
-        page: prevState.page + 1,
-      }),
-      () => {
-        const { search, page } = this.state;
-        this.getImages(search, page);
-      }
-    );
+    this.setState(prevState => ({
+      page: prevState.page + 1,
+    }));
+  };
+
+  onOpenModal = (modalImage, tags) => {
+    this.setState({ showModal: true, imageInfo: { modalImage, tags } });
+  };
+
+  onCloseModal = () => {
+    this.setState({
+      showModal: false,
+      imageInfo: { modalImage: '', tags: '' },
+    });
   };
 
   render() {
-    const { images, isLoading, hasMoreImages } = this.state;
+    const {
+      images,
+      isLoading,
+      total,
+      error,
+      showModal,
+      imageInfo: { modalImage, tags },
+    } = this.state;
+    const totalPage = total / images.length;
     return (
       <section className={css.App}>
         <Searchbar onSubmit={this.onSubmit} />
-        {images.length > 0 && <ImageGallery images={images} />}
+        {images.length > 0 && (
+          <ImageGallery images={images} onOpenModal={this.onOpenModal} />
+        )}
         {isLoading && <Loader />}
-        {hasMoreImages && <Button loadMore={this.onLoadMoreClick} />}
+        {totalPage > 1 && !isLoading && images.length > 0 && (
+          <Button loadMore={this.onLoadMoreClick} />
+        )}
+        {error && <h2>Все пропало!!!</h2>}
+        {showModal && (
+          <Modal
+            onCloseModal={this.onCloseModal}
+            modalImage={modalImage}
+            tags={tags}
+          />
+        )}
         <ToastContainer position="top-center" autoClose={2000} theme="light" />
       </section>
     );

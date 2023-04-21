@@ -2,6 +2,7 @@ import { Component } from 'react';
 import PropTypes from 'prop-types';
 import css from './Searchbar.module.css';
 import { AiOutlineSearch } from "react-icons/ai"
+import { toast } from 'react-toastify';
 
 export class Searchbar extends Component {
   state = {
@@ -9,7 +10,7 @@ export class Searchbar extends Component {
   };
 
   handleChange = e => {
-    this.setState({ search: e.target.value });
+    this.setState({ search: e.target.value.trim() });
   };
 
   handleSubmit = e => {
@@ -17,10 +18,10 @@ export class Searchbar extends Component {
     const { search } = this.state;
     const { onSubmit } = this.props;
     if (search === '') {
-      return
+      return toast.error(`Please enter your request `)
     }
     onSubmit(search)
-    console.log('ok');
+    
   };
 
   render() {

@@ -15,7 +15,7 @@ export const fetchImages = async (q, page = 1) => {
   });
   try {
     const imagesArr = await axios.get(`${URL}?${options}`);
-    return { Arr: imagesArr.data.hits, total: imagesArr.data.total };
+    return { Arr: imagesArr.data.hits, total: imagesArr.data.totalHits };
   } catch (error) {
     console.log(error);
   }
