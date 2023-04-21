@@ -14,6 +14,7 @@ export class App extends Component {
     images: [],
     page: 1,
     isLoading: false,
+    hasMoreImages: false,
   };
 
   onSubmit = searchImages => {
@@ -24,15 +25,15 @@ export class App extends Component {
   getImages = async (search, page) => {
     this.setState({ isLoading: true });
     try {
-      const imagesArr = await fetchImages(search, page);
-      if (imagesArr.length > 0) {
+      const { Arr, total } = await fetchImages(search, page);
+      if (Arr.length > 0) {
         this.setState(prevState => ({
-          images: [...prevState.images, ...imagesArr],
+          images: [...prevState.images, ...Arr],
+          hasMoreImages: total > prevState.images.length + Arr.length,
         }));
-      } else if (imagesArr.length === 0 && this.state.page > 1) {
-        return toast.error(`No more images on serch ${search}`);
       } else {
-        return toast.error(`No images on serch ${search}`);
+        this.setState({ hasMoreImages: false });
+        return toast.error(`No images on search ${search}`);
       }
     } catch (error) {
       console.log(error);
@@ -42,6 +43,7 @@ export class App extends Component {
   };
 
   onLoadMoreClick = () => {
+    if (!this.state.hasMoreImages) return;
     this.setState(
       prevState => ({
         page: prevState.page + 1,
@@ -54,13 +56,13 @@ export class App extends Component {
   };
 
   render() {
-    const { images, isLoading } = this.state;
+    const { images, isLoading, hasMoreImages } = this.state;
     return (
       <section className={css.App}>
         <Searchbar onSubmit={this.onSubmit} />
         {images.length > 0 && <ImageGallery images={images} />}
         {isLoading && <Loader />}
-        {images.length > 0 && <Button loadMore={this.onLoadMoreClick} />}
+        {hasMoreImages && <Button loadMore={this.onLoadMoreClick} />}
         <ToastContainer position="top-center" autoClose={2000} theme="light" />
       </section>
     );

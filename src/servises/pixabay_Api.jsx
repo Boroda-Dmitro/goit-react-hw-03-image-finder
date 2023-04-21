@@ -1,4 +1,3 @@
-// https://pixabay.com/api/?q=cat&page=1&key=34143834-71f54a932c118a9a307ce5c6b&image_type=photo&orientation=horizontal&per_page=12
 import axios from 'axios';
 
 export const fetchImages = async (q, page = 1) => {
@@ -16,7 +15,7 @@ export const fetchImages = async (q, page = 1) => {
   });
   try {
     const imagesArr = await axios.get(`${URL}?${options}`);
-    return imagesArr.data.hits;
+    return { Arr: imagesArr.data.hits, total: imagesArr.data.total };
   } catch (error) {
     console.log(error);
   }
