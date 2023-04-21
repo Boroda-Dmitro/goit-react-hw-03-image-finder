@@ -40,7 +40,7 @@ export class Modal extends Component {
 }
 
 Modal.propTypes = {
-  src: PropTypes.string.isRequired,
+  modalImage: PropTypes.string.isRequired,
   tags: PropTypes.string.isRequired,
   onCloseModal: PropTypes.func.isRequired,
 };
