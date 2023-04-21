@@ -88,7 +88,7 @@ export class App extends Component {
         {totalPage > 1 && !isLoading && images.length > 0 && (
           <Button loadMore={this.onLoadMoreClick} />
         )}
-        {error && <h2>Все пропало!!!</h2>}
+        {error && <h2>An error occurred on the server</h2>}
         {showModal && (
           <Modal
             onCloseModal={this.onCloseModal}
