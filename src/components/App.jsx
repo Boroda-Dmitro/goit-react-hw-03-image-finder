@@ -29,6 +29,8 @@ export class App extends Component {
         this.setState(prevState => ({
           images: [...prevState.images, ...imagesArr],
         }));
+      } else if (imagesArr.length === 0 && this.state.page > 1) {
+        return toast.error(`No more images on serch ${search}`);
       } else {
         return toast.error(`No images on serch ${search}`);
       }
